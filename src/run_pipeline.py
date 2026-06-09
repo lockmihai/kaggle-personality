@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import joblib
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.classification_prep import (
@@ -113,6 +114,12 @@ def run_classification_pipeline(data_path, output_dir="output"):
     best_model = fitted_models[best_model_name]
     best_y_pred = y_preds_dict[best_model_name]
     print(f"\nBest Model identified: {best_model_name} with F1-Score: {df_results.iloc[0]['F1-Score']:.4f}")
+    
+    # Save the best model, preprocessor and column names
+    print("Saving best model, preprocessor, and column names...")
+    joblib.dump(best_model, os.path.join(output_dir, "best_model.joblib"))
+    joblib.dump(preprocessor, os.path.join(output_dir, "preprocessor.joblib"))
+    joblib.dump(X_train.columns.tolist(), os.path.join(output_dir, "train_cols.joblib"))
     
     print(f"\nStep 7: Plotting PCA 2D Classification Errors for best model ({best_model_name})...")
     plot_pca_classification_errors(X_test_trans, y_test, best_y_pred, best_model_name, output_dir)
